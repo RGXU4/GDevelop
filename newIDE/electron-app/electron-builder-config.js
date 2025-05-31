@@ -45,6 +45,8 @@ const config = {
   },
   win: {
     executableName: 'GDevelop',
+    // This is the default configuration that works for the AppX. See below
+    // for the changes done for signing the nsis build.
   },
   nsis: {
     oneClick: false,
@@ -69,6 +71,7 @@ const config = {
       'SL',
     ],
   },
+  // Notarization script for macOS:
   afterSign: 'scripts/electron-builder-after-sign.js',
   publish: [
     {
@@ -98,9 +101,12 @@ if (
 
   // Seems required, see https://github.com/electron-userland/electron-builder/issues/6158#issuecomment-1587045539.
   config.win.signingHashAlgorithms = ['sha256'];
-  console.log('ℹ️ Set Windows build signing options:', config.win);
+
+  config.win.sign = './scripts/electron-builder-win-sign.js',
+
+  console.log('ℹ️ Set Windows build signing options (this should be for the "nsis" build):', config.win);
 } else {
-  console.log('ℹ️ No Windows build signing options set.');
+  console.log('ℹ️ No Windows build signing options set (this should be for the "appx" build).');
 }
 
 module.exports = config;
