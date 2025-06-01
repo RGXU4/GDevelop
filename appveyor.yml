@@ -79,6 +79,8 @@ build_script:
 
       C:\projects\gdevelop\eSignerCKA/eSignerCKATool.exe config -mode product -user "$Env:ESIGNER_USER_NAME" -pass "$Env:ESIGNER_USER_PASSWORD" -totp "$Env:ESIGNER_USER_TOTP" -key "C:\projects\gdevelop\eSignerCKA\master.key" -r
 
+      echo eSigner Username: $Env:ESIGNER_USER_NAME
+
       C:\projects\gdevelop\eSignerCKA/eSignerCKATool.exe unload
 
       C:\projects\gdevelop\eSignerCKA/eSignerCKATool.exe load
@@ -88,6 +90,42 @@ build_script:
       $CodeSigningCert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Select-Object -First 1
 
       echo Certificate: $CodeSigningCert
+
+      C:\projects\gdevelop\eSignerCKA\eSignerCKATool.exe list
+
+      # Check the certificate private key is loaded
+
+      $maxRetries = 10
+
+      $retryDelay = 5
+
+      $certAvailable = $false
+
+      for ($i = 0; $i -lt $maxRetries; $i++) {
+
+        $CodeSigningCert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Subject -like "*GDevelop Ltd*" }
+
+        if ($CodeSigningCert -and $CodeSigningCert.HasPrivateKey) {
+
+          Write-Host "✅ Certificate is loaded and has private key."
+
+          $certAvailable = $true
+
+          break
+
+        }
+
+        Write-Host "⏳ Waiting for certificate to load with private key... ($($i + 1)/$maxRetries)"
+
+        Start-Sleep -Seconds $retryDelay
+
+      }
+
+      if (-not $certAvailable) {
+
+        throw "❌ Certificate failed to load with private key after $maxRetries attempts."
+
+      }
 
       C:\projects\gdevelop\eSignerCKA\eSignerCKATool.exe list
 

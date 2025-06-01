@@ -5,6 +5,21 @@ module.exports = async function customSigner(configuration) {
   return new Promise((resolve, reject) => {
     const fileToSign = configuration.path;
 
+    // Dynamically fetch the container name
+    const getContainerName = () => {
+      const command = `
+        $cert = Get-ChildItem Cert:\\CurrentUser\\My | Where-Object { $_.Subject -like "*GDevelop Ltd*" };
+        $cert.PrivateKey.CspKeyContainerInfo.UniqueKeyContainerName
+        `;
+      const container = execFileSync(
+        'powershell.exe',
+        ['-NoProfile', '-Command', command],
+        { encoding: 'utf-8' }
+      ).trim();
+      return container;
+    };
+    const keyContainer = getContainerName();
+
     const signtool = process.env.SIGNTOOL_PATH;
     if (!signtool) {
       console.error('❌ SIGNTOOL_PATH is not set');
@@ -17,6 +32,8 @@ module.exports = async function customSigner(configuration) {
       'GDevelop Ltd',
       '/csp',
       'eSignerKSP',
+      '/k',
+      keyContainer, // Required with /csp
       '/fd',
       'sha256',
       '/td',
