@@ -17,8 +17,6 @@ module.exports = async function customSigner(configuration) {
       'GDevelop Ltd',
       '/csp',
       'eSignerKSP',
-      '/kc',
-      'eSignerKSP',
       '/fd',
       'sha256',
       '/td',

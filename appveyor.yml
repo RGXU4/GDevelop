@@ -89,6 +89,8 @@ build_script:
 
       echo Certificate: $CodeSigningCert
 
+      C:\projects\gdevelop\eSignerCKA\eSignerCKATool.exe list
+
       # Use a custom signtool path because of the signtool.exe bundled withy electron-builder not working for some reason.
       # Can also be found in versioned folders like "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22000.0/x86/signtool.exe".
 
@@ -99,6 +101,8 @@ build_script:
       $Env:GD_SIGNTOOL_THUMBPRINT = $CodeSigningCert.Thumbprint
 
       $Env:GD_SIGNTOOL_SUBJECT_NAME = ($CodeSigningCert.Subject -replace ", ?", "`n" | ConvertFrom-StringData).CN
+
+      Get-ChildItem Cert:\CurrentUser\My | Format-List -Property Subject, Thumbprint, HasPrivateKey, PrivateKey
 
       # Build the nsis installer (signed: electron-builder will use SignTool.exe with the certificate)
 
