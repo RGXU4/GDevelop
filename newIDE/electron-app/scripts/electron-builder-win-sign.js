@@ -1,4 +1,4 @@
-const { execFile } = require('child_process');
+const { execFile, execFileSync } = require('child_process');
 const path = require('path');
 
 module.exports = async function customSigner(configuration) {
@@ -49,6 +49,7 @@ module.exports = async function customSigner(configuration) {
     ];
 
     console.log(`🔏 Signing ${fileToSign} using eSignerKSP...`);
+    console.log(`🔧 Key container: ${keyContainer}`);
     console.log(`🔏 Signtool path: ${signtool}`);
     console.log(`🔏 Args: ${args.join(' ')}`);
 
